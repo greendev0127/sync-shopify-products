@@ -1,66 +1,111 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Shopify Product Sync
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+This project is a Laravel application that synchronizes products from a Shopify store to a local database. The synchronization process is handled by a background job, ensuring a smooth user experience.
 
-## About Laravel
+## Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+  - **Manual Sync:** Trigger product synchronization from the Shopify store to the local database with a single button click.
+  - **Background Processing:** Utilizes Laravel's queue system for efficient, non-blocking synchronization.
+  - **API Integration:** Securely connects to the Shopify Admin API to fetch product data.
+  - **Frontend Dashboard:** A simple Vue.js frontend displays all synchronized products.
+  - **Scalable Architecture:** The project structure is designed to be robust and scalable, capable of handling a large number of products without affecting website performance.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Prerequisites
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Before you begin, ensure you have the following installed:
 
-## Learning Laravel
+  - PHP \>= 8.1
+  - Composer
+  - Node.js & npm
+  - MySQL or another database
+  - A Shopify store with a private app (or custom app) configured. You will need the **Store URL** and a **Storefront Access Token**. The app must have **read\_products** permission.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Installation
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+Follow these steps to get the project up and running.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 1\. Clone the Repository
 
-## Laravel Sponsors
+```bash
+git clone [your-repository-url]
+cd [your-project-folder]
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 2\. Configure Environment Variables
 
-### Premium Partners
+Create a copy of the `.env.example` file and name it `.env`.
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+```bash
+cp .env.example .env
+```
 
-## Contributing
+Now, open the `.env` file and fill in your database credentials and your Shopify store details.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```ini
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=shopify_sync
+DB_USERNAME=root
+DB_PASSWORD=
 
-## Code of Conduct
+# Shopify Credentials
+SHOPIFY_SHOP_NAME=your-store-name
+SHOPIFY_ACCESS_TOKEN=your_shopify_access_token
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 3\. Install Dependencies
 
-## Security Vulnerabilities
+Install the PHP and JavaScript dependencies.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bash
+composer install
+npm install
+npm run dev
+```
 
-## License
+### 4\. Database Setup
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Run the database migrations to create the necessary tables, including the `products` table.
+
+```bash
+php artisan migrate
+```
+
+### 5\. Start the Queue Worker
+
+The synchronization process runs in the background. You need to start a queue worker to process the jobs. Open a new terminal tab and run:
+
+```bash
+php artisan queue:work
+```
+
+Keep this terminal window open while you are working on the project.
+
+### 6\. Run the Application
+
+Start the Laravel development server.
+
+```bash
+php artisan serve
+```
+
+You can now visit `http://127.0.0.1:8000` in your browser.
+
+## Usage
+
+1.  **Visit the Dashboard:** Navigate to the project's homepage.
+2.  **Sync Products:** Click the **"Sync Products"** button on the page. This will dispatch a job to the queue worker.
+3.  **View Products:** After a short delay, the page will automatically refresh and display the products fetched from your Shopify store.
+
+## Project Structure Explained
+
+The project follows a solid architectural pattern to ensure efficiency and reliability.
+
+  - **`routes/api.php`**: Defines the API endpoints for the frontend, including `/api/products` (to get products) and `/api/sync-products` (to start the sync job).
+  - **`app/Jobs/SyncProductsJob.php`**: The heart of the synchronization logic. This class performs the API call to Shopify and saves the data to the database. It is designed to run asynchronously in the background.
+  - **`app/Http/Controllers/ShopifyController.php`**: Handles the API requests from the frontend, dispatching the job and returning the product data.
+  - **`app/Services/Shopify/ShopifyClient.php`**: A dedicated service class for interacting with the Shopify API, encapsulating the HTTP requests and API logic.
+  - **`resources/js/components/ShopifySync.vue`**: The Vue.js component that provides the user interface. It communicates with the backend via Axios to trigger syncs and fetch data.
+
+This separation of concerns ensures that the application remains responsive and scalable, with long-running tasks being offloaded to the queue system.
